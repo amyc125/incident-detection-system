@@ -1,7 +1,7 @@
 # incident-detection-system
 
 ### Agent
-Collecting extracting and enriching wonfows event logs 
+Collecting extracting and enriching windows event logs 
 
 
 ### Alert Engine
