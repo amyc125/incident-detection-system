@@ -1,0 +1,136 @@
+issus with js async await. Unable to to do a async call inside a map function resulted in of db calls. code did not wait for db call inside map loop
+[0] Server listening on port 8080! 
+[0] Client running on port 8081!
+[0] -------ALERT--------
+[0] username
+[0] AMY
+[0] ---------------
+[0] -------ALERT--------
+[0] event_id
+[0] 130
+[0] ---------------
+[0] -------ALERT--------
+[0] username
+[0] amyc1
+[0] ---------------
+[0] -------ALERT--------
+[0] username
+[0] test
+[0] ---------------
+[0] -------ALERT--------
+[0] username
+[0] test2
+[0] ---------------
+[0] -------ALERT--------
+[0] event_id
+[0] 130
+[0] ---------------
+[0] -------ALERT--------
+[0] event_id
+[0] 1223
+[0] ---------------
+[0] -------ALERT--------
+[0] audit_category
+[0] Account Logon
+[0] ---------------
+[0] -------ALERT--------
+[0] username
+[0] amyc1
+[0] ---------------
+[0] -------ALERT--------
+[0] username
+[0] wow
+[0] ---------------
+[0] -------ALERT--------
+[0] event_type
+[0] AUDIT_FAILURE
+[0] ---------------
+[0] -------ALERT--------
+[0] username
+[0] qwerty
+[0] ---------------
+[0] -------ALERT--------
+[0] event_type
+[0] INFORMATION_TYPE
+[0] ---------------
+[0] -------ALERT--------
+[0] username
+[0] testuser
+[0] ---------------
+[0] -------ALERT--------
+[0] event_id
+[0] 89
+[0] ---------------
+[0] -------ALERT--------
+[0] event_id
+[0] 130111
+[0] ---------------
+[0] -------ALERT--------
+[0] username
+[0] test3
+[0] ---------------
+[0] success
+[0] error: an unknown error has occured
+[0] { event_id: '100', username: 'amyc1', another: '1' }
+[0] ---------------
+
+CODE 
+
+app.get('/api/alerting/scan', async function(req, res) {
+  let returnedAlerts = []
+
+  //get alerts
+  const alerts = await db.collection("alerts").get();
+
+  // change collection to today variable
+  // get all events
+  const eventLogs = await db.collection(today).where(req.body.alert_category.replace(" ", "_").toLowerCase(), '==', req.body.alert_value).get();
+  // const eventLogs = await db.collection("09-08-2022").where(req.body.alert_category.replace(" ", "_").toLowerCase(), '==', req.body.alert_value).get();
+
+  if(alerts.empty) {
+    res.status(404).send({"msg": "no alerts found"});
+  } 
+
+  else {
+    try {
+      alerts.forEach((doc) => {
+        returnedAlerts.push(doc.data());
+      });
+
+      returnedAlerts.map(async alert => {
+        let alertCategory = alert.alert_category.replace(" ", "_").toLowerCase()
+        let alertValue = alert.alert_value
+        console.log("-------ALERT--------")
+        console.log(alertCategory)
+        console.log(alertValue)
+        console.log("---------------")
+        
+        await db.collection(today).where(alertCategory.replace(" ", "_").toLowerCase(), '==', alertValue).get();
+        
+      });
+      console.log("success");
+      res.status(200).send({"result": returnedAlerts, "events": returnedEventLogs});
+    } 
+    catch {
+      console.log("error: an unknown error has occured");
+      res.status(500).send({"error": "an unknown error has occured"})
+    }
+  }
+});
+
+
+Made you think... is this best way to do it? 
+
+No!
+
+What happens if the web app micro service goes offline. aAgents will be sending event logs to the db but the alert_triggers collection which relies on 
+futher processing won't continue to be updated as the web app is down. 
+
+To increase data persistance even if the web app goes down the alerting scan engine should be seperated into its own micro service. 
+
+The alerting scan engine will periodically process data and update the alert_triggers db collection indepdantly from the web app.
+
+The micro service can be deployed locally on a workstation and left to run in the background or deployed to a serverless cloud function
+and triggered using a cron expression.  
+
+Python to the rescue !!! :D
