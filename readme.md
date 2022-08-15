@@ -1,22 +1,24 @@
-### incident-detection-system
+# incident-detection-system
 
-# Agent
+### Agent
 Collecting extracting and enriching wonfows event logs 
 
 
-# Alert Engine
+### Alert Engine
 Scanning event logs against alerts created and saved from the web application  
 
-# Requirements 
+### Requirements 
 Python 3.8 
 Firebase admin 
 win32Py
 inquirer
 
 
-# Run 
+### Run 
+```bash
 python main.py
-
+```
+```bash
 python alerts_engine.py
-
+```
 
