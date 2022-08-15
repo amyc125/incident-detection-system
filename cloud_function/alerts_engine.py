@@ -1,6 +1,5 @@
-import json
 import uuid
-import datetime 
+from datetime import date
 import firebase_admin 
 from firebase_admin import credentials
 from firebase_admin import firestore
@@ -9,11 +8,9 @@ cred = credentials.Certificate("../agent/service-account-file.json")
 firebase_admin.initialize_app(cred)
 db = firestore.client()
 
-# using now() to get current time 
-current_time = datetime.datetime.now() 
+today = date.today()
+today = today.strftime("%d-%m-%Y")# convert timestamp to string in dd-mm-yyyy
 
-
-today = "{}-{}-{}".format(current_time.day, current_time.month, current_time.year)
 print("Running alerts scan for: {}".format(today))
 
 def extract_alerts_and_logs():
@@ -21,8 +18,7 @@ def extract_alerts_and_logs():
     event_logs = []
     
     alert_docs = db.collection('alerts').stream()
-    event_log_docs = db.collection('09-08-2022').stream()
-    #event_log_docs = db.collection(today).stream()
+    event_log_docs = db.collection(today).stream()
 
     for doc in alert_docs:
         alert = doc.to_dict()

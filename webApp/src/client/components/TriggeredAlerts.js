@@ -19,7 +19,7 @@ export default class Count extends Component {
       // refreshes the triggered alerts every minute
       console.log("refresh");
       await this.getTriggeredAlerts()
-    },60000)
+    },10000)
   }
 
   getTriggeredAlerts = async () => {
