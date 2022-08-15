@@ -34,14 +34,13 @@ EMAIL = SELECTED_EVENT_CATEGORIES['email']
 today = date.today()
 DATESTAMP = today.strftime("%d-%m-%Y")# convert timestamp to string in dd-mm-yyyy
 
-if "All" in SELECTED_EVENT_CATEGORIES['choices']:
+if "All" in SELECTED_EVENT_CATEGORIES['choices'] or SELECTED_EVENT_CATEGORIES['choices'] == []:
     SELECTED_EVENT_CATEGORIES = ["System", "Application", "Security"]
 else:
     SELECTED_EVENT_CATEGORIES = SELECTED_EVENT_CATEGORIES['choices']
 
 with open('./windows_audit_categories.json', 'r') as audit_categories: 
     AUDIT_CATEGORIES = json.load(audit_categories)
-
 
 #----------------------------------------------------------------------
 def handle_users_collection(username, email):
